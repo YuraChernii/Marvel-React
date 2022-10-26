@@ -9,6 +9,7 @@ const BASE_OFFSET = 210;
 const useMarvelService = () => {
   const { loading, request, error, clearError } = useHttp();
 
+  // Characters
   const getAllCharacters = async (offset = BASE_OFFSET) => {
     var { ts, hash, api_url, public_key } = getRequestParams();
 
@@ -28,12 +29,6 @@ const useMarvelService = () => {
     return _transformCharacter(res.data.results[0]);
   };
 
-  const getRequestParams = () => {
-    var ts = new Date().getTime();
-    var hash = md5(ts + PRIV_KEY + PUBLIC_KEY).toString();
-    return { ts, hash, api_url: API_URL, public_key: PUBLIC_KEY };
-  };
-
   const _transformCharacter = (char) => {
     return {
       id: char.id,
@@ -48,7 +43,52 @@ const useMarvelService = () => {
     };
   };
 
-  return { loading, error, getAllCharacters, getCharacter, clearError };
+  // Comics
+  const getComicById = async (id) => {
+    var { ts, hash, api_url, public_key } = getRequestParams();
+
+    const res = await request(
+      `${api_url}comics/${id}?ts=${ts}&apikey=${public_key}&hash=${hash}`
+    );
+
+    return _transformComic(res.data.results[0]);
+  };
+
+  const getComics = async (offset = BASE_OFFSET) => {
+    var { ts, hash, api_url, public_key } = getRequestParams();
+
+    const res = await request(
+      `${api_url}comics?offset=${offset}&ts=${ts}&apikey=${public_key}&hash=${hash}`
+    );
+
+    return res.data.results.map((elem) => _transformComic(elem));
+  };
+
+  const _transformComic = (comic) => {
+    return {
+      name: comic.title,
+      image: comic?.thumbnail?.path + "." + comic.thumbnail.extension,
+      description: comic.description,
+      price: comic.prices[0].price,
+    };
+  };
+
+  // Helpers
+  const getRequestParams = () => {
+    var ts = new Date().getTime();
+    var hash = md5(ts + PRIV_KEY + PUBLIC_KEY).toString();
+    return { ts, hash, api_url: API_URL, public_key: PUBLIC_KEY };
+  };
+
+  return {
+    loading,
+    error,
+    getAllCharacters,
+    getCharacter,
+    clearError,
+    getComicById,
+    getComics,
+  };
 };
 
 export default useMarvelService;

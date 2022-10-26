@@ -92,16 +92,12 @@ const CharList = ({ onCharSelected }) => {
     return [];
   }, [charList]);
 
-  const functToProve = useMemo(() => {
-    return <h1>wedwed</h1>;
-  }, []);
   const errorMessage = error ? <ErrorMessage /> : null;
   const spinner = loading && !newItemLoading ? <Spinner /> : null;
   const content = !((loading && !newItemLoading) || error) ? items : null;
 
   return (
     <div className="char__list">
-      {functToProve}
       {errorMessage}
       {spinner}
       {content}
