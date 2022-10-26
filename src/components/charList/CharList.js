@@ -4,63 +4,44 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import MarvelService from "../../services/MarvelService";
 import "./charList.scss";
+import useMarvelService from "../../services/MarvelService";
 
 const CharList = ({ onCharSelected }) => {
   const [charList, setCharList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
 
-  const marvelService = useMemo(() => {
-    return new MarvelService();
-  }, []);
+  const { loading, error, getAllCharacters } = useMarvelService();
 
   useEffect(() => {
-    onRequest();
+    onRequest(offset, true);
   }, []);
 
-  const onRequest = (offset) => {
-    onCharListLoading();
-    marvelService
-      .getAllCharacters(offset)
-      .then(onCharListLoaded)
-      .catch(onError);
-  };
+  const onRequest = (offset, initial) => {
+    initial ? setNewItemLoading(false) : setNewItemLoading(true);
 
-  const onCharListLoading = () => {
-    setNewItemLoading(true);
+    getAllCharacters(offset).then(onCharListLoaded);
   };
 
   const onCharListLoaded = (newCharList) => {
-    console.log("onCharListLoaded");
     let ended = false;
     if (newCharList.length < 9) {
       ended = true;
     }
     setCharList((charList) => [...charList, ...newCharList]);
-    setLoading(false);
-    console.log("smth");
+
     setOffset((offset) => offset + 9);
     setCharEnded(ended);
     setNewItemLoading(false);
   };
 
-  const onError = () => {
-    setError(true);
-    setLoading(false);
-  };
-
-  console.log("setref222222");
   const itemRefs = useRef([]);
   const setRef = (ref) => {
     itemRefs.current.push(ref);
   };
 
   const focusOnItem = (id) => {
-    console.log("id", id);
-    console.log(itemRefs);
     itemRefs.current.forEach((item) =>
       item.classList.remove("char__item_selected")
     );
@@ -68,8 +49,6 @@ const CharList = ({ onCharSelected }) => {
     itemRefs.current[id].focus();
   };
 
-  // Этот метод создан для оптимизации,
-  // чтобы не помещать такую конструкцию в метод render
   const renderItems = (arr) => {
     const items = arr.map((item, i) => {
       let imgStyle = { objectFit: "cover" };
@@ -102,7 +81,6 @@ const CharList = ({ onCharSelected }) => {
         </li>
       );
     });
-    // А эта конструкция вынесена для центровки спиннера/ошибки
 
     return <ul className="char__grid">{items}</ul>;
   };
@@ -113,11 +91,17 @@ const CharList = ({ onCharSelected }) => {
     }
     return [];
   }, [charList]);
+
+  const functToProve = useMemo(() => {
+    return <h1>wedwed</h1>;
+  }, []);
   const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? items : null;
+  const spinner = loading && !newItemLoading ? <Spinner /> : null;
+  const content = !((loading && !newItemLoading) || error) ? items : null;
+
   return (
     <div className="char__list">
+      {functToProve}
       {errorMessage}
       {spinner}
       {content}
@@ -125,7 +109,7 @@ const CharList = ({ onCharSelected }) => {
         className="button button__main button__long"
         disabled={newItemLoading}
         style={{ display: charEnded ? "none" : "block" }}
-        onClick={() => onRequest(offset)}
+        onClick={() => onRequest(offset, false)}
       >
         <div className="inner">load more</div>
       </button>

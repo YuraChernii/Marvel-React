@@ -1,43 +1,40 @@
 import md5 from "md5";
+import { useHttp } from "../hooks/http.hook";
 
-class MarvelService {
-  _apiBase = "http://gateway.marvel.com:80/v1/public/";
-  // ЗДЕСЬ БУДЕТ ВАШ КЛЮЧ, ЭТОТ КЛЮЧ МОЖЕТ НЕ РАБОТАТЬ
-  PRIV_KEY = "e83322980b9923c15e1d4cd2dd2015cb05d3bf88";
-  PUBLIC_KEY = "2409291755ce35cc0e70f6b5931b6e91";
-  _baseOffset = 210;
+const PRIV_KEY = "e83322980b9923c15e1d4cd2dd2015cb05d3bf88";
+const PUBLIC_KEY = "2409291755ce35cc0e70f6b5931b6e91";
+const API_URL = "http://gateway.marvel.com:80/v1/public/";
+const BASE_OFFSET = 210;
 
-  getResource = async (url) => {
-    let res = await fetch(url);
+const useMarvelService = () => {
+  const { loading, request, error, clearError } = useHttp();
 
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-    }
+  const getAllCharacters = async (offset = BASE_OFFSET) => {
+    var { ts, hash, api_url, public_key } = getRequestParams();
 
-    return await res.json();
-  };
-
-  getAllCharacters = async (offset = this._baseOffset) => {
-    var ts = new Date().getTime();
-    var hash = md5(ts + this.PRIV_KEY + this.PUBLIC_KEY).toString();
-
-    const res = await this.getResource(
-      `${this._apiBase}characters?limit=9&offset=${offset}&ts=${ts}&apikey=${this.PUBLIC_KEY}&hash=${hash}`
+    const res = await request(
+      `${api_url}characters?limit=9&offset=${offset}&ts=${ts}&apikey=${public_key}&hash=${hash}`
     );
-    return res.data.results.map(this._transformCharacter);
+    return res.data.results.map(_transformCharacter);
   };
 
-  getCharacter = async (id) => {
-    var ts = new Date().getTime();
-    var hash = md5(ts + this.PRIV_KEY + this.PUBLIC_KEY).toString();
+  const getCharacter = async (id) => {
+    var { ts, hash, api_url, public_key } = getRequestParams();
 
-    const res = await this.getResource(
-      `${this._apiBase}characters/${id}?ts=${ts}&apikey=${this.PUBLIC_KEY}&hash=${hash}`
+    const res = await request(
+      `${api_url}characters/${id}?ts=${ts}&apikey=${public_key}&hash=${hash}`
     );
-    return this._transformCharacter(res.data.results[0]);
+
+    return _transformCharacter(res.data.results[0]);
   };
 
-  _transformCharacter = (char) => {
+  const getRequestParams = () => {
+    var ts = new Date().getTime();
+    var hash = md5(ts + PRIV_KEY + PUBLIC_KEY).toString();
+    return { ts, hash, api_url: API_URL, public_key: PUBLIC_KEY };
+  };
+
+  const _transformCharacter = (char) => {
     return {
       id: char.id,
       name: char.name,
@@ -50,6 +47,8 @@ class MarvelService {
       comics: char.comics.items,
     };
   };
-}
 
-export default MarvelService;
+  return { loading, error, getAllCharacters, getCharacter };
+};
+
+export default useMarvelService;
