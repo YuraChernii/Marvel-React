@@ -11,7 +11,6 @@ const RandomChar = () => {
   const [char, setChar] = useState({});
 
   const { loading, error, getCharacter, clearError } = useMarvelService();
-  console.log("update");
   useEffect(() => {
     updateChar();
     const timerId = setInterval(updateChar, 15000);
@@ -22,7 +21,6 @@ const RandomChar = () => {
   }, []);
 
   const onCharLoaded = (char) => {
-    console.log("before setChar");
     setChar(char);
   };
 

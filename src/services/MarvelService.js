@@ -11,20 +11,18 @@ const useMarvelService = () => {
 
   // Characters
   const getAllCharacters = async (offset = BASE_OFFSET) => {
-    var { ts, hash, api_url, public_key } = getRequestParams();
+    var authParams = getAuthParams();
 
     const res = await request(
-      `${api_url}characters?limit=9&offset=${offset}&ts=${ts}&apikey=${public_key}&hash=${hash}`
+      `${API_URL}characters?limit=9&offset=${offset}&${authParams}`
     );
     return res.data.results.map(_transformCharacter);
   };
 
   const getCharacter = async (id) => {
-    var { ts, hash, api_url, public_key } = getRequestParams();
+    var authParams = getAuthParams();
 
-    const res = await request(
-      `${api_url}characters/${id}?ts=${ts}&apikey=${public_key}&hash=${hash}`
-    );
+    const res = await request(`${API_URL}characters/${id}?${authParams}`);
 
     return _transformCharacter(res.data.results[0]);
   };
@@ -45,20 +43,18 @@ const useMarvelService = () => {
 
   // Comics
   const getComicById = async (id) => {
-    var { ts, hash, api_url, public_key } = getRequestParams();
+    var authParams = getAuthParams();
 
-    const res = await request(
-      `${api_url}comics/${id}?ts=${ts}&apikey=${public_key}&hash=${hash}`
-    );
+    const res = await request(`${API_URL}comics/${id}?${authParams}`);
 
     return _transformComic(res.data.results[0]);
   };
 
   const getComics = async (offset = BASE_OFFSET) => {
-    var { ts, hash, api_url, public_key } = getRequestParams();
+    var authParams = getAuthParams();
 
     const res = await request(
-      `${api_url}comics?offset=${offset}&ts=${ts}&apikey=${public_key}&hash=${hash}`
+      `${API_URL}comics?offset=${offset}&${authParams}`
     );
 
     return res.data.results.map((elem) => _transformComic(elem));
@@ -66,7 +62,10 @@ const useMarvelService = () => {
 
   const _transformComic = (comic) => {
     return {
+      id: comic.id,
+      title: comic.title,
       name: comic.title,
+      pageCount: comic.pageCount,
       image: comic?.thumbnail?.path + "." + comic.thumbnail.extension,
       description: comic.description,
       price: comic.prices[0].price,
@@ -74,10 +73,11 @@ const useMarvelService = () => {
   };
 
   // Helpers
-  const getRequestParams = () => {
+  const getAuthParams = () => {
     var ts = new Date().getTime();
     var hash = md5(ts + PRIV_KEY + PUBLIC_KEY).toString();
-    return { ts, hash, api_url: API_URL, public_key: PUBLIC_KEY };
+    let params = `ts=${ts}&apikey=${PUBLIC_KEY}&hash=${hash}`;
+    return params;
   };
 
   return {

@@ -3,6 +3,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
+import { Link } from "react-router-dom";
 const LOADING_OFFSET = 10;
 
 const ComicsList = () => {
@@ -13,12 +14,14 @@ const ComicsList = () => {
 
   useEffect(() => {
     getComics(currOffset.current).then(updateComicsList);
+    console.log("call");
   }, []);
 
   const updateComicsList = (newRecords) => {
     setComicsList((comicsList) => {
       return [...comicsList, ...newRecords];
     });
+    console.log(comicsList);
   };
 
   const loadComicRecords = () => {
@@ -28,13 +31,12 @@ const ComicsList = () => {
   };
 
   const HTMLComicsList = useMemo(() => {
-    console.log(comicsList);
     return (
       <div className="comics__list">
         <div className="comics__grid">
           {comicsList.map((elem, index) => {
             return (
-              <div className="" key={index}>
+              <Link to={`/comics/${elem.id}`} key={index}>
                 <img
                   className="comics__item-img"
                   src={elem.image}
@@ -42,7 +44,7 @@ const ComicsList = () => {
                 />
                 <div className="comics__item-name">{elem.name}</div>
                 <div className="comics__item-price">{elem.price}$</div>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -64,7 +64,7 @@ const CharList = ({ onCharSelected }) => {
           className="char__item"
           tabIndex={0}
           ref={setRef}
-          key={item.id}
+          key={i}
           onClick={() => {
             onCharSelected(item.id);
             focusOnItem(i);
