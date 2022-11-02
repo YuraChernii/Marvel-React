@@ -5,6 +5,7 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 import MarvelService from "../../services/MarvelService";
 import "./charList.scss";
 import useMarvelService from "../../services/MarvelService";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const CharList = ({ onCharSelected }) => {
   const [charList, setCharList] = useState([]);
@@ -60,29 +61,34 @@ const CharList = ({ onCharSelected }) => {
       }
 
       return (
-        <li
-          className="char__item"
-          tabIndex={0}
-          ref={setRef}
-          key={i}
-          onClick={() => {
-            onCharSelected(item.id);
-            focusOnItem(i);
-          }}
-          onKeyPress={(e) => {
-            if (e.key === " " || e.key === "Enter") {
+        <CSSTransition key={i} timeout={500} classNames="item">
+          <li
+            className="char__item"
+            tabIndex={0}
+            ref={setRef}
+            onClick={() => {
               onCharSelected(item.id);
               focusOnItem(i);
-            }
-          }}
-        >
-          <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-          <div className="char__name">{item.name}</div>
-        </li>
+            }}
+            onKeyPress={(e) => {
+              if (e.key === " " || e.key === "Enter") {
+                onCharSelected(item.id);
+                focusOnItem(i);
+              }
+            }}
+          >
+            <img src={item.thumbnail} alt={item.name} style={imgStyle} />
+            <div className="char__name">{item.name}</div>
+          </li>
+        </CSSTransition>
       );
     });
 
-    return <ul className="char__grid">{items}</ul>;
+    return (
+      <TransitionGroup component={"ul"} className="char__grid">
+        {items}
+      </TransitionGroup>
+    );
   };
 
   const items = useMemo(() => {
