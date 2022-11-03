@@ -12,7 +12,7 @@ const CharList = ({ onCharSelected }) => {
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
-
+  const [showList, setShowList] = useState(false);
   const { loading, error, getAllCharacters } = useMarvelService();
 
   useEffect(() => {
@@ -30,6 +30,8 @@ const CharList = ({ onCharSelected }) => {
     if (newCharList.length < 9) {
       ended = true;
     }
+
+    setShowList(true);
     setCharList((charList) => [...charList, ...newCharList]);
 
     setOffset((offset) => offset + 9);
@@ -39,13 +41,16 @@ const CharList = ({ onCharSelected }) => {
 
   const itemRefs = useRef([]);
   const setRef = (ref) => {
+    if (ref == null) return;
     itemRefs.current.push(ref);
+    console.log(ref);
   };
 
   const focusOnItem = (id) => {
-    itemRefs.current.forEach((item) =>
-      item.classList.remove("char__item_selected")
-    );
+    itemRefs.current.forEach((item) => {
+      console.log(item);
+      item.classList.remove("char__item_selected");
+    });
     itemRefs.current[id].classList.add("char__item_selected");
     itemRefs.current[id].focus();
   };
@@ -106,7 +111,15 @@ const CharList = ({ onCharSelected }) => {
     <div className="char__list">
       {errorMessage}
       {spinner}
-      {content}
+      <CSSTransition
+        in={showList}
+        timeout={500}
+        classNames="item"
+        appear
+        unmountOnExit
+      >
+        <>{content}</>
+      </CSSTransition>
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
