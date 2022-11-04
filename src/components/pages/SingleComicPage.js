@@ -1,12 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import "./SingleComicPage.scss";
-import xMen from "../../resources/img/x-men.png";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-import Skeleton from "../skeleton/Skeleton";
 
 const SingleComic = () => {
   const { comicId } = useParams();

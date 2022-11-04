@@ -27,6 +27,24 @@ const useMarvelService = () => {
     return _transformCharacter(res.data.results[0]);
   };
 
+  const getCharactersByName = async (name) => {
+    var authParams = getAuthParams();
+
+    const res = await request(
+      `${API_URL}characters?name=${name}&${authParams}`
+    );
+    console.log(res.data);
+    return res.data.results.length > 0 ? res.data.results : null;
+  };
+
+  const getCharById = async (id) => {
+    var authParams = getAuthParams();
+
+    const res = await request(`${API_URL}characters/${id}?${authParams}`);
+
+    return res.data.results[0];
+  };
+
   const _transformCharacter = (char) => {
     return {
       id: char.id,
@@ -85,6 +103,8 @@ const useMarvelService = () => {
     error,
     getAllCharacters,
     getCharacter,
+    getCharById,
+    getCharactersByName,
     clearError,
     getComicById,
     getComics,

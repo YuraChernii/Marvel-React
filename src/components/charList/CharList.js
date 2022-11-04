@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState, useRef } from "react";
 
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-import MarvelService from "../../services/MarvelService";
-import "./charList.scss";
+import styles from "./charList.module.scss";
 import useMarvelService from "../../services/MarvelService";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import GeneralConfiguration from "../../constants/GeneralConfiguration";
 
 const CharList = ({ onCharSelected }) => {
   const [charList, setCharList] = useState([]);
@@ -49,9 +49,9 @@ const CharList = ({ onCharSelected }) => {
   const focusOnItem = (id) => {
     itemRefs.current.forEach((item) => {
       console.log(item);
-      item.classList.remove("char__item_selected");
+      item.classList.remove(styles.char__item_selected);
     });
-    itemRefs.current[id].classList.add("char__item_selected");
+    itemRefs.current[id].classList.add(styles.char__item_selected);
     itemRefs.current[id].focus();
   };
 
@@ -66,9 +66,13 @@ const CharList = ({ onCharSelected }) => {
       }
 
       return (
-        <CSSTransition key={i} timeout={500} classNames="item">
+        <CSSTransition
+          key={i}
+          timeout={GeneralConfiguration.transitionTimeout}
+          classNames={styles.item}
+        >
           <li
-            className="char__item"
+            className={styles.char__item}
             tabIndex={0}
             ref={setRef}
             onClick={() => {
@@ -83,14 +87,14 @@ const CharList = ({ onCharSelected }) => {
             }}
           >
             <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-            <div className="char__name">{item.name}</div>
+            <div className={styles.char__name}>{item.name}</div>
           </li>
         </CSSTransition>
       );
     });
 
     return (
-      <TransitionGroup component={"ul"} className="char__grid">
+      <TransitionGroup component={"ul"} className={styles.char__grid}>
         {items}
       </TransitionGroup>
     );
@@ -108,13 +112,13 @@ const CharList = ({ onCharSelected }) => {
   const content = !((loading && !newItemLoading) || error) ? items : null;
 
   return (
-    <div className="char__list">
+    <div className={styles.char__list}>
       {errorMessage}
       {spinner}
       <CSSTransition
         in={showList}
-        timeout={500}
-        classNames="item"
+        timeout={GeneralConfiguration.transitionTimeout}
+        classNames={styles.item}
         appear
         unmountOnExit
       >
