@@ -1,38 +1,39 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Helmet } from "react-helmet";
 
 import RandomChar from "../randomChar/RandomChar";
-
 import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
+import CharSearchForm from "../charSearchForm/CharSearchForm";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
+
 import decoration from "../../resources/img/vision.png";
-import CharSearch from "../charSearch/CharSearch";
-import styles from "../charList/charList.module.scss";
 
 const MainPage = () => {
-  const [selectedChar, setSelectedChar] = useState(null);
+  const [selectedChar, setChar] = useState(null);
 
-  const onCharSelected = (id) => {
-    setSelectedChar(id);
-  };
+  const onCharSelected = useCallback((id) => {
+    setChar(id);
+  }, []);
   return (
     <>
       <Helmet>
-        <meta name="description" content="Info about comics snd characters" />
-        <title>Main page</title>
+        <meta name="description" content="Marvel information portal" />
+        <title>Marvel information portal</title>
       </Helmet>
       <ErrorBoundary>
         <RandomChar />
       </ErrorBoundary>
-      <div className={styles.char__content}>
+      <div className="char__content">
         <ErrorBoundary>
           <CharList onCharSelected={onCharSelected} />
         </ErrorBoundary>
         <div>
           <ErrorBoundary>
             <CharInfo charId={selectedChar} />
-            <CharSearch />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <CharSearchForm />
           </ErrorBoundary>
         </div>
       </div>
